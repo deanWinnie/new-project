@@ -4,12 +4,11 @@
 	</div>
 </template>
 <script setup lang="ts">
-const fun=()=>{
-	console.log('your are funking man')
-}
+	const fun = () => {
+		console.log('your are funking man')
+	}
 
-
-fun()
+	fun()
 </script>
 <style scoped lang="scss">
 	.box {
