@@ -7,21 +7,21 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import request from './utils/request';
+	import { onMounted } from 'vue'
+	import request from './utils/request'
 
-onMounted(()=> {
-	request({
-		url:'/user/login1',
-		method:'post',
-		data: {
-			username:'admin',
-			password:'123456'
-		}
-	}).then(res=>{
-		console.log(res)
+	onMounted(() => {
+		request({
+			url: '/user/login1',
+			method: 'post',
+			data: {
+				username: 'admin',
+				password: '123456',
+			},
+		}).then((res) => {
+			console.log(res)
+		})
 	})
-})
 </script>
 <style scoped lang="scss">
 	.box {

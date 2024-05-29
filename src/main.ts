@@ -7,7 +7,7 @@ import 'virtual:svg-icons-register'
 import '@/style/index.scss'
 const app = createApp(App)
 app.use(ElementPlus, {
-  locale: zhCn,
+	locale: zhCn,
 })
 //全局组件
 import gloalComponent from '@/components'
