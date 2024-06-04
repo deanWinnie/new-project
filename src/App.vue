@@ -1,10 +1,7 @@
 <template>
-	<div class="box">
-		<h1>i am dean</h1>
-		<el-button>wode</el-button>
-		<el-pagination layout="prev, pager, next" :total="50" />
-		<SvgIcon name="stop" color="pink" width="100px" height="100px"></SvgIcon>
-	</div>
+	<router-view></router-view>
+		
+		<!-- <SvgIcon name="stop" color="pink" width="100px" height="100px"></SvgIcon> -->
 </template>
 <script setup lang="ts">
 	import { onMounted } from 'vue'
@@ -17,13 +14,5 @@
 	})
 </script>
 <style scoped lang="scss">
-	.box {
-		// background-color: antiquewhite;
-		color: aquamarine;
-		h1 {
-			font-weight: 800;
-			font-size: 50px;
-			color: $color;
-		}
-	}
+
 </style>
