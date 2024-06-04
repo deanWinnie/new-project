@@ -6,6 +6,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import 'virtual:svg-icons-register'
 import '@/style/index.scss'
 import router from './router'
+import pinia from './store'
 const app = createApp(App)
 app.use(ElementPlus, {
 	locale: zhCn,
@@ -14,5 +15,6 @@ app.use(ElementPlus, {
 import gloalComponent from '@/components'
 app.use(gloalComponent)
 app.use(router)
+app.use(pinia)
 app.mount('#app')
 console.log(import.meta.env)

@@ -16,7 +16,14 @@ request.interceptors.request.use((config) => {
 request.interceptors.response.use(
 	(res) => {
 		//成功回调
-		return res.data
+		if (res.data.code === 200) {
+			return res.data
+		} else {
+			ElMessage({
+				type: 'error',
+				message: res.data.data.message,
+			})
+		}
 	},
 	(error) => {
 		let message = ''
@@ -38,7 +45,6 @@ request.interceptors.response.use(
 				message = '网络错误'
 				break
 		}
-		console.log(message)
 		ElMessage({
 			type: 'error',
 			message,
