@@ -15,7 +15,7 @@
 	})
 </script>
 <style scoped lang="scss">
-.box{
-	color: $base-menu-width;
-}
+	.box {
+		color: $base-menu-width;
+	}
 </style>
