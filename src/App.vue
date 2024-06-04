@@ -1,7 +1,7 @@
 <template>
 	<router-view></router-view>
-		
-		<!-- <SvgIcon name="stop" color="pink" width="100px" height="100px"></SvgIcon> -->
+
+	<!-- <SvgIcon name="stop" color="pink" width="100px" height="100px"></SvgIcon> -->
 </template>
 <script setup lang="ts">
 	import { onMounted } from 'vue'
@@ -13,6 +13,4 @@
 		})
 	})
 </script>
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>
