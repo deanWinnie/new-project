@@ -9,7 +9,7 @@ export const constantRoute = [
 	{
 		//登录后的主页
 		path: '/',
-		component: () => import('@/views/home/index.vue'),
+		component: () => import('@/layout/index.vue'),
 		name: 'layout',
 	},
 	{

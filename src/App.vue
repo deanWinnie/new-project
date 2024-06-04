@@ -1,4 +1,5 @@
 <template>
+	<div class="box"></div>
 	<router-view></router-view>
 
 	<!-- <SvgIcon name="stop" color="pink" width="100px" height="100px"></SvgIcon> -->
@@ -13,4 +14,8 @@
 		})
 	})
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.box{
+	color: $base-menu-width;
+}
+</style>
