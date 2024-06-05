@@ -7,6 +7,11 @@
 <script setup lang="ts">
 	import setting from '@/setting'
 </script>
+<script lang="ts">
+	export default {
+		name: 'Logo',
+	}
+</script>
 <style scoped lang="scss">
 	.logo {
 		width: 100%;
@@ -16,12 +21,13 @@
 		align-items: center;
 		padding: 20px;
 		img {
-			width: 40px;
-			height: 40px;
+			width: 25px;
+			height: 25px;
 		}
 		p {
 			font-size: $base-logo-title-fontSize;
 			margin-left: 10px;
+			white-space: nowrap;
 		}
 	}
 </style>

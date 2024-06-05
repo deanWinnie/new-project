@@ -1,57 +1,80 @@
 <template>
 	<div class="layout_container">
 		<!-- 左侧菜单 -->
-		<div class="layout_slider">
+		<div class="layout_slider" :class="{ fold: layoutSettingStore.fold }">
 			<Logo></Logo>
 			<!-- 展示菜单 -->
 			<el-scrollbar class="scrollbar">
 				<!-- 菜单组件 -->
-				<el-menu background-color="#001529" text-color="white">
-					<el-menu-item index="1">首 页</el-menu-item>
-					<el-menu-item index="2">数据大屏</el-menu-item>
-					<el-sub-menu index="3">
-						<template #title>
-							<span>权限管理</span>
-						</template>
-						<el-menu-item index="2-1">用户管理</el-menu-item>
-						<el-menu-item index="2-2">角色管理</el-menu-item>
-						<el-menu-item index="2-3">菜单管理</el-menu-item>
-					</el-sub-menu>
+				<el-menu
+					background-color="#001529"
+					text-color="white"
+					:default-active="$route.path"
+					:collapse="layoutSettingStore.fold"
+				>
+					<Menu :menuList="userStore.menuRoutes"></Menu>
 				</el-menu>
 			</el-scrollbar>
 		</div>
 		<!-- 顶部导航 -->
-		<div class="layout_tabbar">456</div>
+		<div class="layout_tabbar" :class="{ fold: layoutSettingStore.fold }">
+			<Tabbar></Tabbar>
+		</div>
 		<!-- 内容展示区域 -->
-		<div class="layout_main">
-			<h1 style="height: 1000px; background-color: blueviolet"></h1>
+		<div class="layout_main" :class="{ fold: layoutSettingStore.fold }">
+			<Main></Main>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
 	import Logo from './Logo/index.vue'
+	import Menu from './Menu/index.vue'
+	import Main from './Main/index.vue'
+	import useUserStore from '@/store/module/user'
+	import { useRoute } from 'vue-router'
+	import Tabbar from './Tabbar/index.vue'
+	import useLayoutSettingStore from '@/store/module/setting'
+	const layoutSettingStore = useLayoutSettingStore()
+	const userStore = useUserStore()
+	const $route = useRoute()
+</script>
+<script lang="ts">
+	export default {
+		name: 'Layout',
+	}
 </script>
 <style scoped lang="scss">
 	.layout_container {
 		width: 100%;
 		height: 100vh;
-		background: red;
 		.layout_slider {
 			width: $base-menu-width;
 			height: 100vh;
 			background: $base-menu-background;
 			color: white;
+			transition: all 0.3s;
 			.scrollbar {
 				height: calc(100% - $base-menu-logo-height);
+				.el-menu {
+					border-right: none;
+				}
+			}
+			&.fold {
+				width: $base-menu-min-width;
 			}
 		}
 		.layout_tabbar {
 			position: fixed;
 			width: calc(100% - $base-menu-width);
-			background-color: aqua;
+			background-color: white;
 			height: $base-tabbar-height;
 			top: 0px;
 			left: $base-menu-width;
+			transition: all 0.3s;
+			&.fold {
+				width: calc(100% - $base-menu-min-width);
+				left: $base-menu-min-width;
+			}
 		}
 		.layout_main {
 			position: absolute;
@@ -62,6 +85,11 @@
 			left: $base-menu-width;
 			padding: 20px;
 			overflow: auto;
+			transition: all 0.3s;
+			&.fold {
+				width: calc(100% - $base-menu-min-width);
+				left: $base-menu-min-width;
+			}
 		}
 	}
 </style>
