@@ -24,7 +24,7 @@
 	import { User, Lock } from '@element-plus/icons-vue'
 	import { reactive, ref } from 'vue'
 	import useUserStore from '@/store/module/user'
-	import { useRouter } from 'vue-router'
+	import { useRouter, useRoute } from 'vue-router'
 	import { ElNotification } from 'element-plus'
 	import { getTime } from '@/utils/time'
 	const userStore = useUserStore()
@@ -34,6 +34,7 @@
 	})
 	const refLoginForm = ref()
 	const $router = useRouter()
+	const $route = useRoute()
 	let refLoading = ref(false)
 	const rules = reactive({
 		username: [
@@ -59,7 +60,8 @@
 								title: `Hi,${getTime()}好`,
 								message: '欢迎回来',
 							})
-							$router.push('/')
+							const redirect: any = $route.query.redirect
+							$router.push({ path: redirect || '/' })
 						}
 					})
 					.catch(() => {

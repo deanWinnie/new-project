@@ -8,6 +8,7 @@ import '@/style/index.scss'
 import router from './router'
 import pinia from './store'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import './premission'
 const app = createApp(App)
 app.use(ElementPlus, {
 	locale: zhCn,
