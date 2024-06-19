@@ -30,7 +30,7 @@
 	const userStore = useUserStore()
 	const loginForm = reactive({
 		username: 'admin',
-		password: '123456',
+		password: '111111',
 	})
 	const refLoginForm = ref()
 	const $router = useRouter()

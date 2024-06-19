@@ -36,8 +36,8 @@
 		}
 	}
 	//退出按钮
-	const logout = () => {
-		userStore.logout()
+	const logout = async () => {
+		await userStore.logout()
 		$router.push({
 			path: '/login',
 			query: {
