@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { reqLogin, reqUserInfo,reqLogout } from '@/api/user'
+import { reqLogin, reqUserInfo, reqLogout } from '@/api/user'
 import type { LoginForm } from '@/api/user/type'
 import { constantRoute } from '@/router/router'
 const useUserStore = defineStore('User', {
@@ -34,13 +34,13 @@ const useUserStore = defineStore('User', {
 		},
 		async logout() {
 			const res = await reqLogout()
-			if(res){
+			if (res) {
 				this.username = ''
 				this.avatar = ''
 				this.token = ''
 				localStorage.removeItem('TOKEN')
 				return res
-			}else{
+			} else {
 				Promise.reject(new Error())
 			}
 		},
