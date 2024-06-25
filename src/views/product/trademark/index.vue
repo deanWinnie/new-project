@@ -10,9 +10,21 @@
 				</template>
 			</el-table-column>
 			<el-table-column label="操作">
-				<template #default>
-					<el-button type="primary" size="small" icon="Edit" @click="handleUpdate"></el-button>
-					<el-button type="primary" size="small" icon="Delete"></el-button>
+				<template #default="scope">
+					<el-button type="primary" size="small" icon="Edit" @click="handleUpdate(scope.row)"></el-button>
+					<el-popconfirm
+						confirm-button-text="确定"
+						cancel-button-text="取消"
+						icon="Delete"
+						icon-color="red"
+						:title="`您确定要删除${scope.row.tmName}?`"
+						@confirm="confirmEvent(scope.row.id)"
+						width="250"
+					>
+						<template #reference>
+							<el-button type="primary" size="small" icon="Delete"></el-button>
+						</template>
+					</el-popconfirm>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -28,11 +40,11 @@
 		/>
 	</el-card>
 	<el-dialog v-model="refDialogFormVisible" :title="refDialogTitle">
-		<el-form :model="trademarkParams" style="width: 80%">
-			<el-form-item label="品牌名称" label-width="80">
+		<el-form :model="trademarkParams" style="width: 80%" :rules="rules" ref="refFrom">
+			<el-form-item label="品牌名称" label-width="100" prop="tmName">
 				<el-input v-model="trademarkParams.tmName" autocomplete="off" placeholder="请输入" />
 			</el-form-item>
-			<el-form-item label="品牌LOGO" label-width="80">
+			<el-form-item label="品牌LOGO" label-width="100" prop="logoUrl">
 				<el-upload
 					class="avatar-uploader"
 					action="/api/admin/product/fileUpload"
@@ -54,9 +66,9 @@
 	</el-dialog>
 </template>
 <script setup lang="ts">
-	import { onMounted, reactive, ref } from 'vue'
-	import { reqHasTradeMark, reqAddOrUpdateTrademark } from '@/api/product/trademark'
-	import type { Records } from '@/api/product/trademark/type'
+	import { nextTick, onMounted, reactive, ref } from 'vue'
+	import { reqHasTradeMark, reqAddOrUpdateTrademark, reqDeleteTradeMark } from '@/api/product/trademark'
+	import type { Records, TradeMark } from '@/api/product/trademark/type'
 	import type { UploadProps } from 'element-plus'
 	import { ElMessage } from 'element-plus'
 
@@ -66,10 +78,31 @@
 	let refTrademarkList = ref<Records>([])
 	let refDialogFormVisible = ref(false)
 	let refDialogTitle = ref('添加品牌')
-	let trademarkParams = reactive({
+	let trademarkParams = reactive<TradeMark>({
 		tmName: '',
 		logoUrl: '',
+		id: 0,
 	})
+	let refFrom = ref()
+	const validatorTmName = (_rule: any, value: any, callBack: any) => {
+		if (value.trim().length >= 2) {
+			callBack()
+		} else {
+			callBack(new Error('品牌名称位数大于等于两位'))
+		}
+	}
+	const validatorLogoUrl = (_rule: any, value: any, callBack: any) => {
+		if (value) {
+			callBack()
+		} else {
+			callBack(new Error('LOGO图片必须上传'))
+		}
+	}
+	const rules = {
+		tmName: [{ required: true, trigger: 'blur', message: '品牌不能为空', validator: validatorTmName }],
+		logoUrl: [{ required: true, trigger: 'blur', message: '品牌LOGO不能为空', validator: validatorLogoUrl }],
+	}
+
 	const getHasTradeMark = async (pager = 1) => {
 		refPageNo.value = pager
 		const res = await reqHasTradeMark(refPageNo.value, refLimit.value)
@@ -80,16 +113,44 @@
 		getHasTradeMark()
 	}
 	const handleAdd = () => {
+		refDialogTitle.value = '添加品牌'
+
+		trademarkParams.id = 0
+		trademarkParams.logoUrl = ''
+		trademarkParams.tmName = ''
 		refDialogFormVisible.value = true
+		//方法一：为什么要写refFrom.value?这样的形式是因为第一次打开value的时候，还没渲染出来clearValidate方法会报错
+		//refFrom.value?.clearValidate()
+		//方法二
+		nextTick(() => {
+			refFrom.value.clearValidate()
+		})
 	}
-	const handleUpdate = () => {
+	const handleUpdate = (row: TradeMark) => {
+		refDialogTitle.value = '修改品牌'
+		//常规赋值
+		// trademarkParams.logoUrl = row.logoUrl
+		// trademarkParams.tmName = row.tmName
+		// trademarkParams.id = row.id
+		//ES6合并对象语法
+		Object.assign(trademarkParams, row)
 		refDialogFormVisible.value = true
+		nextTick(() => {
+			refFrom.value.clearValidate()
+		})
 	}
-	const handleConfirm = () => {
-		refDialogFormVisible.value = false
+	const handleConfirm = async () => {
+		await refFrom.value.validate()
+		const res = await reqAddOrUpdateTrademark(trademarkParams)
+		if (res) {
+			ElMessage.success(trademarkParams.id ? '修改成功' : '添加成功')
+			refDialogFormVisible.value = false
+			getHasTradeMark(trademarkParams.id ? refPageNo.value : 1)
+		}
 	}
 	const handleAvatarSuccess: UploadProps['onSuccess'] = (res) => {
 		trademarkParams.logoUrl = res.data
+		refFrom.value.clearValidate('logoUrl')
 	}
 
 	const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
@@ -101,6 +162,14 @@
 			return false
 		}
 		return true
+	}
+	const confirmEvent = async (id: number) => {
+		const res = await reqDeleteTradeMark(id)
+		if (res) {
+			ElMessage.success('删除品牌成功')
+			//当前页只有一条数据的时候回到上一页
+			getHasTradeMark(refTrademarkList.value.length > 1 ? refPageNo.value : refPageNo.value - 1)
+		}
 	}
 	onMounted(() => {
 		getHasTradeMark()

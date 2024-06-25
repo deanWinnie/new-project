@@ -46,6 +46,11 @@ export default defineConfig(({ command,mode }) => {
     },
     server: {
       proxy: {
+        '/avip': {
+          target: env.VITE_SERVE2,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/avip/, '')
+        },
         // 选项写法
         [env.VITE_APP_BASE_API]: {
           target: env.VITE_SERVE,

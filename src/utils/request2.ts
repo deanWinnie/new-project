@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 //第一步：利用axios的creat()方法，去创建axios实例
 let request = axios.create({
 	//基础路径
-	baseURL: import.meta.env.VITE_APP_BASE_API,
+	baseURL: 'avip',
 	timeout: 50000, //设置超时时间
 })
 //第二步：request实例添加请求与响应拦截器
