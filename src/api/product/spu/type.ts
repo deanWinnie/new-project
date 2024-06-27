@@ -15,4 +15,13 @@ export interface SpuData {
 	spuImageList: null
 }
 
-export interface HasSpuResponseData extends ResponseData {}
+export interface HasSpuResponseData extends ResponseData {
+	data: {
+		records: SpuData[]
+		total: number
+		size: number
+		current: number
+		searchCount: boolean
+		pages: number
+	}
+}
