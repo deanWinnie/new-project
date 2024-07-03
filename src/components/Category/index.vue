@@ -2,7 +2,7 @@
 	<el-card>
 		<el-form :inline="true" class="demo-form-inline">
 			<el-form-item label="一级分类">
-				<el-select v-model="categoryStore.c1Id" @change="getC2" :disabled="!scene">
+				<el-select v-model="categoryStore.c1Id" @change="getC2" :disabled="scene !== 0">
 					<el-option
 						v-for="item in categoryStore.c1List"
 						:key="item.id"
@@ -12,7 +12,7 @@
 				</el-select>
 			</el-form-item>
 			<el-form-item label="二级分类">
-				<el-select v-model="categoryStore.c2Id" @change="getC3" :disabled="!scene">
+				<el-select v-model="categoryStore.c2Id" @change="getC3" :disabled="scene !== 0">
 					<el-option
 						v-for="item in categoryStore.c2List"
 						:key="item.id"
@@ -22,7 +22,7 @@
 				</el-select>
 			</el-form-item>
 			<el-form-item label="三级分类">
-				<el-select v-model="categoryStore.c3Id" :disabled="!scene">
+				<el-select v-model="categoryStore.c3Id" :disabled="scene !== 0">
 					<el-option
 						v-for="item in categoryStore.c3List"
 						:key="item.id"
@@ -61,7 +61,7 @@
 	defineProps({
 		//xlink:href属性值的前缀
 		scene: {
-			type: Boolean,
+			type: Number,
 		},
 	})
 </script>

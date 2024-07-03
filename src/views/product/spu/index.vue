@@ -2,30 +2,42 @@
 	<div>
 		<Category :scene="refScene"></Category>
 		<el-card style="margin: 10px 0">
-			<el-button type="primary" icon="Plus" :disabled="!categoryStore.c3Id">添加SPU</el-button>
-			<el-table style="margin: 10px 0" border :data="refRecords">
-				<el-table-column label="序号" type="index" align="center" width="80"></el-table-column>
-				<el-table-column label="SPU名称" prop="spuName"></el-table-column>
-				<el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
-				<el-table-column label="操作">
-					<template #default="scope">
-						<el-button size="small" type="primary" icon="Plus" title="添加SKU"></el-button>
-						<el-button size="small" type="primary" icon="Edit" title="修改SKU"></el-button>
-						<el-button size="small" type="primary" icon="View" title="查看SKU列表"></el-button>
-						<el-button size="small" type="primary" icon="Delete" title="删除SKU"></el-button>
-					</template>
-				</el-table-column>
-			</el-table>
-			<el-pagination
-				v-model:current-page="refPageNo"
-				v-model:page-size="refPageSize"
-				:page-sizes="[3, 5, 7, 9]"
-				:background="true"
-				layout="prev, pager, next, jumper,->,sizes,total"
-				:total="refTotal"
-				@size-change="handleSize"
-				@current-change="getHasSpu"
-			/>
+			<div v-show="refScene == 0">
+				<el-button type="primary" icon="Plus" :disabled="!categoryStore.c3Id" @click="addSpu">添加SPU</el-button>
+				<el-table style="margin: 10px 0" border :data="refRecords">
+					<el-table-column label="序号" type="index" align="center" width="80"></el-table-column>
+					<el-table-column label="SPU名称" prop="spuName"></el-table-column>
+					<el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
+					<el-table-column label="操作">
+						<template #default="scope">
+							<el-button size="small" type="primary" icon="Plus" title="添加SKU"></el-button>
+							<el-button
+								size="small"
+								type="primary"
+								icon="Edit"
+								title="修改SPU"
+								@click="updateSpu(scope.row)"
+							></el-button>
+							<el-button size="small" type="primary" icon="View" title="查看SKU列表"></el-button>
+							<el-button size="small" type="primary" icon="Delete" title="删除SKU"></el-button>
+						</template>
+					</el-table-column>
+				</el-table>
+				<el-pagination
+					v-model:current-page="refPageNo"
+					v-model:page-size="refPageSize"
+					:page-sizes="[3, 5, 7, 9]"
+					:background="true"
+					layout="prev, pager, next, jumper,->,sizes,total"
+					:total="refTotal"
+					@size-change="handleSize"
+					@current-change="getHasSpu"
+				/>
+			</div>
+			<!-- 添加SPU|修改SPU的子组件 -->
+			<SpuForm ref="spu" v-show="refScene == 1" @changeScene="changeScene"></SpuForm>
+			<!-- 添加SKU的子组件 -->
+			<SkuForm v-show="refScene == 2"></SkuForm>
 		</el-card>
 	</div>
 </template>
@@ -34,8 +46,10 @@
 	import { reqHasSpu } from '@/api/product/spu'
 	import useCategoryStore from '@/store/module/category'
 	import type { SpuData } from '@/api/product/spu/type'
+	import SpuForm from './spuForm.vue'
+	import SkuForm from './skuForm.vue'
 	const categoryStore = useCategoryStore()
-	let refScene = ref(true)
+	let refScene = ref(0)
 	//分页器默认页码
 	let refPageNo = ref(1)
 	//每一页展示几条数据
@@ -43,6 +57,7 @@
 	//数据总数
 	let refTotal = ref(0)
 	let refRecords = ref<SpuData[]>([])
+	const spu = <any>ref()
 	watch(
 		() => categoryStore.c3Id,
 		() => {
@@ -61,6 +76,18 @@
 	}
 	const handleSize = () => {
 		getHasSpu()
+	}
+	const addSpu = () => {
+		refScene.value = 1
+	}
+	//子组件SpuForm绑定自定义事件：目前是让子组件通知父组件切换场景为0
+	const changeScene = (num: number) => {
+		refScene.value = num
+	}
+	const updateSpu = async (row: SpuData) => {
+		refScene.value = 1
+		//调用子组件的方法
+		spu.value.initHasSpuData(row)
 	}
 </script>
 <style scoped lang="scss"></style>

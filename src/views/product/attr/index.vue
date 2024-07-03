@@ -3,7 +3,7 @@
 		<Category :scene="refScene"></Category>
 	</div>
 	<el-card style="margin: 10px 0">
-		<div v-show="refScene">
+		<div v-show="refScene == 0">
 			<el-button icon="Plus" type="primary" :disabled="!categoryStore.c3Id" @click="addAttr">添加平台属性</el-button>
 			<el-table style="margin: 10px 0" :data="refAttrList">
 				<el-table-column label="序号" type="index" align="center" width="80px"></el-table-column>
@@ -36,7 +36,7 @@
 				</el-table-column>
 			</el-table>
 		</div>
-		<div v-show="!refScene">
+		<div v-show="refScene == 1">
 			<el-form :inline="true">
 				<el-form-item label="属性名称">
 					<el-input v-model="attrParams.attrName"></el-input>
@@ -91,7 +91,7 @@
 	import { ElMessage } from 'element-plus'
 	const categoryStore = useCategoryStore()
 	let refAttrList = ref<Attr[]>([])
-	let refScene = ref(true)
+	let refScene = ref(0)
 	let attrParams = reactive<Attr>({
 		attrName: '',
 		attrValueList: [],
@@ -115,7 +115,7 @@
 		}
 	}
 	const addAttr = () => {
-		refScene.value = false
+		refScene.value = 1
 		Object.assign(attrParams, {
 			attrName: '',
 			attrValueList: [],
@@ -135,7 +135,7 @@
 		})
 	}
 	const updateAttr = (row: Attr) => {
-		refScene.value = false
+		refScene.value = 1
 		//attrParams = row  这个方式导致attrParams失去响应式
 		Object.assign(attrParams, JSON.parse(JSON.stringify(row)))
 	}
@@ -149,7 +149,7 @@
 	const save = async () => {
 		const res = await reqAddOrUpdateAttr(attrParams)
 		if (res) {
-			refScene.value = true
+			refScene.value = 0
 			ElMessage.success(attrParams.id ? '修改成功' : '添加成功')
 		}
 		getAttr()
@@ -180,7 +180,7 @@
 		})
 	}
 	const cancel = () => {
-		refScene.value = true
+		refScene.value = 0
 	}
 	onBeforeUnmount(() => {
 		categoryStore.$reset()
