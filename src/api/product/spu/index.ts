@@ -7,6 +7,7 @@ import type {
 	SaleAttrResponseData,
 	HasSaleAttrResponseData,
 	SpuData,
+	SkuData,
 } from './type'
 enum API {
 	//获已有spu的数据
@@ -23,19 +24,22 @@ enum API {
 	ADDSPU_URL = '/admin/product/saveSpuInfo',
 	//修改SPU
 	UPDATESPU_URL = '/admin/product/updateSpuInfo',
+	//追加一个新增的SKU地址
+	ADDSKU_URL = '/admin/product/saveSkuInfo',
 }
 export const reqHasSpu = (page: number, limit: number, c3Id: string | number) => {
-	return request.get<any, HasSpuResponseData>(API.HASSPU_URL + `${page}/${limit}?category3Id=${c3Id}`)
+	return request2.get<any, HasSpuResponseData>(API.HASSPU_URL + `${page}/${limit}?category3Id=${c3Id}`)
 }
-export const reqAllTradMark = () => request.get<any, AllTradeMark>(API.ALLTRADEMARK_URL)
-export const reqSPUImage = (spuId: number) => request.get<any, SpuHasImage>(API.IMAGE_URL + spuId)
+export const reqAllTradMark = () => request2.get<any, AllTradeMark>(API.ALLTRADEMARK_URL)
+export const reqSPUImage = (spuId: number) => request2.get<any, SpuHasImage>(API.IMAGE_URL + spuId)
 export const reqSpuHasSaleAttr = (spuId: number) =>
 	request.get<any, SaleAttrResponseData>(API.SPUHASSALEATTR_URL + spuId)
-export const reqAllSaleAttr = () => request.get<any, HasSaleAttrResponseData>(API.ALLSALEATTR_URL)
+export const reqAllSaleAttr = () => request2.get<any, HasSaleAttrResponseData>(API.ALLSALEATTR_URL)
 export const reqAddOrUpdateSpu = (data: SpuData) => {
 	if (data.id) {
-		return request.post<any, any>(API.UPDATESPU_URL, data)
+		return request2.post<any, any>(API.UPDATESPU_URL, data)
 	} else {
-		return request.post<any, any>(API.ADDSPU_URL, data)
+		return request2.post<any, any>(API.ADDSPU_URL, data)
 	}
 }
+export const reqAddSku = (data: SkuData) => request2.post<any, any>(API.ADDSKU_URL, data)

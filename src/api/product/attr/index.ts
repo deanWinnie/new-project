@@ -16,9 +16,9 @@ enum API {
 	DELETEATTR_URL = '/admin/product/deleteAttr/',
 }
 
-export const reqC1 = () => request.get<any, CategoryResponseData>(API.C1_URL)
-export const reqC2 = (c1Id: number) => request.get<any, CategoryResponseData>(API.C2_URL + c1Id)
-export const reqC3 = (c2Id: number) => request.get<any, CategoryResponseData>(API.C3_URL + c2Id)
+export const reqC1 = () => request2.get<any, CategoryResponseData>(API.C1_URL)
+export const reqC2 = (c1Id: number) => request2.get<any, CategoryResponseData>(API.C2_URL + c1Id)
+export const reqC3 = (c2Id: number) => request2.get<any, CategoryResponseData>(API.C3_URL + c2Id)
 export const reqAttr = (c1Id: number, c2Id: number, c3Id: number) =>
 	request2.get<any, AttrResponseDate>(`${API.ATTR_URL}${c1Id}/${c2Id}/${c3Id}`)
 export const reqAddOrUpdateAttr = (data: Attr) => request2.post<any, any>(API.ADDORUPDATEATTR_URL, data)

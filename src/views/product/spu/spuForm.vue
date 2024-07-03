@@ -78,7 +78,7 @@
 			</el-table>
 		</el-form-item>
 		<el-form-item>
-			<el-button type="primary">保存</el-button>
+			<el-button :disabled="!(saleAttr.length > 0)" type="primary" @click="save">保存</el-button>
 			<el-button type="primary" @click="cancel">取消</el-button>
 		</el-form-item>
 	</el-form>
@@ -95,12 +95,12 @@
 		SaleAttr,
 		HasSaleAttr,
 	} from '@/api/product/spu/type'
-	import { reqAllTradMark, reqSPUImage, reqSpuHasSaleAttr, reqAllSaleAttr } from '@/api/product/spu'
+	import { reqAllTradMark, reqSPUImage, reqSpuHasSaleAttr, reqAllSaleAttr, reqAddOrUpdateSpu } from '@/api/product/spu'
 	import { computed, ref } from 'vue'
 	import { ElMessage, UploadProps } from 'element-plus'
 	const $emit = defineEmits(['changeScene'])
 	const cancel = () => {
-		$emit('changeScene', 0)
+		$emit('changeScene', { flag: 0, params: spuParams.value.id ? 'update' : 'add' })
 	}
 	let tradeMarkList = ref<TradeMark[]>([])
 	let imgList = ref<SpuImage[]>([])
@@ -189,8 +189,40 @@
 		row.saleAttrValue = ''
 		row.flag = false
 	}
+	const save = async () => {
+		spuParams.value.spuImageList = imgList.value.map((item: any) => {
+			return {
+				imgName: item.name,
+				imgUrl: (item.response && item.response.data) || item.url,
+			}
+		})
+		spuParams.value.spuSaleAttrList = saleAttr.value
+		const res = await reqAddOrUpdateSpu(spuParams.value)
+		if (res) {
+			ElMessage.success(spuParams.value.id ? '更新成功' : '添加成功')
+			cancel()
+		}
+	}
+	const initReset = async (c3Id: number) => {
+		spuParams.value = {
+			spuName: '',
+			category3Id: '',
+			description: '',
+			tmId: '',
+			spuImageList: [],
+			spuSaleAttrList: [],
+		}
+		imgList.value = []
+		saleAttr.value = []
+		saleAttrIdAndValueName.value = ''
+		spuParams.value.category3Id = c3Id
+		const res: AllTradeMark = await reqAllTradMark()
+		const res1: HasSaleAttrResponseData = await reqAllSaleAttr()
+		tradeMarkList.value = res.data
+		allSaleAttr.value = res1.data
+	}
 	//如果想要父组件调用子组件的方法需要暴漏
-	defineExpose({ initHasSpuData })
+	defineExpose({ initHasSpuData, initReset })
 </script>
 <style scoped>
 	.el-select {

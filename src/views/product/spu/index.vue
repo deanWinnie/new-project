@@ -10,7 +10,7 @@
 					<el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
 					<el-table-column label="操作">
 						<template #default="scope">
-							<el-button size="small" type="primary" icon="Plus" title="添加SKU"></el-button>
+							<el-button size="small" type="primary" icon="Plus" title="添加SKU" @click="addSku(scope.row)"></el-button>
 							<el-button
 								size="small"
 								type="primary"
@@ -37,7 +37,7 @@
 			<!-- 添加SPU|修改SPU的子组件 -->
 			<SpuForm ref="spu" v-show="refScene == 1" @changeScene="changeScene"></SpuForm>
 			<!-- 添加SKU的子组件 -->
-			<SkuForm v-show="refScene == 2"></SkuForm>
+			<SkuForm ref="sku" v-show="refScene == 2" @changeScene="changeScene"></SkuForm>
 		</el-card>
 	</div>
 </template>
@@ -49,7 +49,7 @@
 	import SpuForm from './spuForm.vue'
 	import SkuForm from './skuForm.vue'
 	const categoryStore = useCategoryStore()
-	let refScene = ref(0)
+	let refScene = ref(2)
 	//分页器默认页码
 	let refPageNo = ref(1)
 	//每一页展示几条数据
@@ -58,6 +58,7 @@
 	let refTotal = ref(0)
 	let refRecords = ref<SpuData[]>([])
 	const spu = <any>ref()
+	const sku = <any>ref()
 	watch(
 		() => categoryStore.c3Id,
 		() => {
@@ -79,15 +80,25 @@
 	}
 	const addSpu = () => {
 		refScene.value = 1
+		spu.value.initReset(categoryStore.c3Id)
 	}
 	//子组件SpuForm绑定自定义事件：目前是让子组件通知父组件切换场景为0
-	const changeScene = (num: number) => {
-		refScene.value = num
+	const changeScene = ({ flag, params }: any) => {
+		refScene.value = flag
+		if (params == 'update') {
+			getHasSpu(refPageNo.value)
+		} else {
+			getHasSpu()
+		}
 	}
 	const updateSpu = async (row: SpuData) => {
 		refScene.value = 1
 		//调用子组件的方法
 		spu.value.initHasSpuData(row)
+	}
+	const addSku = (row: SpuData) => {
+		refScene.value = 2
+		sku.value.initSkuData(categoryStore.c3Id, categoryStore.c2Id, row)
 	}
 </script>
 <style scoped lang="scss"></style>
