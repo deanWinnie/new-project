@@ -18,8 +18,18 @@
 								title="修改SPU"
 								@click="updateSpu(scope.row)"
 							></el-button>
-							<el-button size="small" type="primary" icon="View" title="查看SKU列表"></el-button>
-							<el-button size="small" type="primary" icon="Delete" title="删除SKU"></el-button>
+							<el-button
+								size="small"
+								type="primary"
+								@click="findSku(scope.row)"
+								icon="View"
+								title="查看SKU列表"
+							></el-button>
+							<el-popconfirm :title="`你确定要删除${scope.row.spuName}吗`" width="200" @confirm="removeSpu(scope.row)">
+								<template #reference>
+									<el-button size="small" type="primary" icon="Delete" title="删除SKU"></el-button>
+								</template>
+							</el-popconfirm>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -38,18 +48,31 @@
 			<SpuForm ref="spu" v-show="refScene == 1" @changeScene="changeScene"></SpuForm>
 			<!-- 添加SKU的子组件 -->
 			<SkuForm ref="sku" v-show="refScene == 2" @changeScene="changeScene"></SkuForm>
+			<el-dialog title="SKU列表" v-model="show">
+				<el-table border :data="skuArr">
+					<el-table-column label="SKU名字" prop="skuName"></el-table-column>
+					<el-table-column label="SKU价格" prop="price"></el-table-column>
+					<el-table-column label="SKU的重量" prop="weight"></el-table-column>
+					<el-table-column label="SKU图片" prop="weight">
+						<template #default="scope">
+							<img :src="scope.row.skuDefaultImg" height="100" alt="" />
+						</template>
+					</el-table-column>
+				</el-table>
+			</el-dialog>
 		</el-card>
 	</div>
 </template>
 <script setup lang="ts">
-	import { ref, watch } from 'vue'
-	import { reqHasSpu } from '@/api/product/spu'
+	import { onBeforeUnmount, ref, watch } from 'vue'
+	import { reqHasSpu, reqSkuList, reqRemoveSpu } from '@/api/product/spu'
 	import useCategoryStore from '@/store/module/category'
-	import type { SpuData } from '@/api/product/spu/type'
+	import type { SkuData, SpuData } from '@/api/product/spu/type'
 	import SpuForm from './spuForm.vue'
 	import SkuForm from './skuForm.vue'
+	import { ElMessage } from 'element-plus'
 	const categoryStore = useCategoryStore()
-	let refScene = ref(2)
+	let refScene = ref(0)
 	//分页器默认页码
 	let refPageNo = ref(1)
 	//每一页展示几条数据
@@ -57,8 +80,10 @@
 	//数据总数
 	let refTotal = ref(0)
 	let refRecords = ref<SpuData[]>([])
-	const spu = <any>ref()
-	const sku = <any>ref()
+	const spu = ref<any>()
+	const sku = ref<any>()
+	let skuArr = ref<SkuData[]>([])
+	let show = ref(false)
 	watch(
 		() => categoryStore.c3Id,
 		() => {
@@ -100,5 +125,22 @@
 		refScene.value = 2
 		sku.value.initSkuData(categoryStore.c3Id, categoryStore.c2Id, row)
 	}
+	const findSku = async (row: SpuData) => {
+		const res = await reqSkuList(row.id as number)
+		if (res) {
+			skuArr.value = res.data
+			show.value = true
+		}
+	}
+	const removeSpu = async (row: SpuData) => {
+		const res = await reqRemoveSpu(row.id as number)
+		if (res) {
+			ElMessage.success('删除成功')
+			getHasSpu(refRecords.value.length == 1 ? refPageNo.value - 1 : refPageNo.value)
+		}
+	}
+	onBeforeUnmount(() => {
+		categoryStore.$reset()
+	})
 </script>
 <style scoped lang="scss"></style>

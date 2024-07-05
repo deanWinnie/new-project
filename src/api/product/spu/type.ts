@@ -106,3 +106,6 @@ export interface SkuData {
 	skuSaleAttrValueList?: SaleList[]
 	skuDefaultImg: string
 }
+export interface SkuInfoData extends ResponseData {
+	data: SkuData[]
+}
