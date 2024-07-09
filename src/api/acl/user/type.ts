@@ -25,3 +25,23 @@ export interface UserResponse extends ResponseData {
 		pages: number
 	}
 }
+
+export interface RoleData {
+	id?: number
+	updateTime?: string
+	createTime?: string
+	roleName: string
+	remark: string
+}
+
+export interface AllRoleResponse extends ResponseData {
+	data: {
+		assignRoles: RoleData[]
+		allRolesList: RoleData[]
+	}
+}
+
+export interface SetRoleData {
+	roleIdList: number[]
+	userId: number
+}

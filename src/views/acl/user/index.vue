@@ -2,17 +2,22 @@
 	<el-card style="height: 80px">
 		<el-form :inline="true" class="form">
 			<el-form-item label="用户名">
-				<el-input></el-input>
+				<el-input v-model="keyword"></el-input>
 			</el-form-item>
 			<el-form-item>
-				<el-button type="primary">搜索</el-button>
+				<el-button type="primary" @click="search">搜索</el-button>
+				<el-button type="primary" @click="reset">重置</el-button>
 			</el-form-item>
 		</el-form>
 	</el-card>
 	<el-card style="margin: 10px 0">
 		<el-button type="primary" @click="addUser">添加</el-button>
-		<el-button type="primary">批量删除</el-button>
-		<el-table style="margin: 10px 0" border :data="userArr">
+		<el-popconfirm :title="`你确定要批量删除吗`" width="200" @confirm="deletUserList">
+			<template #reference>
+				<el-button type="primary" :disabled="selectIdList.length == 0">批量删除</el-button>
+			</template>
+		</el-popconfirm>
+		<el-table style="margin: 10px 0" border :data="userArr" @selection-change="handleSelectionChange">
 			<el-table-column type="selection"></el-table-column>
 			<el-table-column type="index" label="#" align="center"></el-table-column>
 			<el-table-column label="id" align="center" prop="id"></el-table-column>
@@ -24,7 +29,11 @@
 				<template #default="scope">
 					<el-button type="primary" icon="User" size="small" @click="setRole(scope.row)">分配角色</el-button>
 					<el-button type="primary" icon="Edit" size="small" @click="updateUser(scope.row)">编辑</el-button>
-					<el-button type="primary" icon="Delete" size="small">删除</el-button>
+					<el-popconfirm :title="`你确定要删除${scope.row.username}吗`" width="200" @confirm="deletUser(scope.row)">
+						<template #reference>
+							<el-button type="primary" icon="Delete" size="small">删除</el-button>
+						</template>
+					</el-popconfirm>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -76,9 +85,9 @@
 					<el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">
 						全选
 					</el-checkbox>
-					<el-checkbox-group v-model="checkedRoles" @change="handleCheckedCitiesChange">
-						<el-checkbox v-for="(role, index) in allRole" :key="index" :label="role">
-							{{ role }}
+					<el-checkbox-group v-model="useRole" @change="handleCheckedCitiesChange">
+						<el-checkbox v-for="role in allRole" :key="role.id" :label="role">
+							{{ role.roleName }}
 						</el-checkbox>
 					</el-checkbox-group>
 				</el-form-item>
@@ -87,15 +96,22 @@
 		<template #footer>
 			<div style="flex: auto">
 				<el-button @click="drawer1 = false">取消</el-button>
-				<el-button type="primary" @click="save">确定</el-button>
+				<el-button type="primary" @click="confirmRole">确定</el-button>
 			</div>
 		</template>
 	</el-drawer>
 </template>
 <script setup lang="ts">
 	import { nextTick, onMounted, reactive, ref } from 'vue'
-	import { reqAllUser, reqAddOrUpdateUser } from '@/api/acl/user'
-	import { User } from '@/api/acl/user/type'
+	import {
+		reqAllUser,
+		reqAddOrUpdateUser,
+		reqAllRole,
+		reqSetRole,
+		reqDeleteUser,
+		reqDeleteUserList,
+	} from '@/api/acl/user'
+	import { RoleData, User } from '@/api/acl/user/type'
 	import { ElMessage } from 'element-plus'
 
 	let refPageNo = ref(1)
@@ -107,8 +123,10 @@
 	let userForm = ref()
 	let checkAll = ref(false)
 	let isIndeterminate = ref(true)
-	const checkedRoles = ref(['销售', '运营', '运维'])
-	const allRole = ref(['销售', '运营', '运维', '行政', '人事', '技术', '科研'])
+	let useRole = ref<RoleData[]>([])
+	let allRole = ref<RoleData[]>([])
+	let selectIdList = ref<number[]>([])
+	let keyword = ref('')
 	const rules = reactive({
 		username: [
 			{ required: true, message: '用户姓名不为空', trigger: 'blur' },
@@ -131,7 +149,7 @@
 	})
 	const getHasUser = async (pager = 1) => {
 		refPageNo.value = pager
-		const res = await reqAllUser(refPageNo.value, refPageSize.value)
+		const res = await reqAllUser(refPageNo.value, refPageSize.value, keyword.value)
 		if (res) {
 			refTotal.value = res.data.total
 			userArr.value = res.data.records
@@ -143,6 +161,7 @@
 	const addUser = () => {
 		drawer.value = true
 		Object.assign(userParams, {
+			id: 0,
 			username: '',
 			name: '',
 			password: '',
@@ -175,18 +194,61 @@
 			}
 		})
 	}
-	const setRole = (row: User) => {
-		drawer1.value = true
+	const setRole = async (row: User) => {
 		Object.assign(userParams, row)
+		const res = await reqAllRole(row.id as number)
+		if (res) {
+			useRole.value = res.data.assignRoles
+			allRole.value = res.data.allRolesList
+			drawer1.value = true
+		}
 	}
 	const handleCheckAllChange = (val: boolean) => {
-		checkedRoles.value = val ? allRole.value : []
+		useRole.value = val ? allRole.value : []
 		isIndeterminate.value = false
 	}
 	const handleCheckedCitiesChange = (value: string[]) => {
 		const checkedCount = value.length
 		checkAll.value = checkedCount === allRole.value.length
 		isIndeterminate.value = checkedCount > 0 && checkedCount < allRole.value.length
+	}
+	const confirmRole = async () => {
+		const data = {
+			userId: userParams.id as number,
+			roleIdList: useRole.value.map((item) => {
+				return item.id as number
+			}),
+		}
+		const res = await reqSetRole(data)
+		if (res) {
+			ElMessage.success('分配成功')
+			drawer1.value = false
+			getHasUser(refPageNo.value)
+		}
+	}
+	const deletUser = async (row: User) => {
+		const res = await reqDeleteUser(row.id as number)
+		if (res) {
+			ElMessage.success('删除用户成功')
+			getHasUser(userArr.value.length > 1 ? refPageNo.value : refPageNo.value - 1)
+		}
+	}
+	const handleSelectionChange = (val: User[]) => {
+		selectIdList.value = val.map((item) => item.id as number)
+	}
+	const deletUserList = async () => {
+		const res = await reqDeleteUserList(selectIdList.value)
+		if (res) {
+			ElMessage.success('批量删除用户成功')
+			getHasUser(1)
+		}
+	}
+	const search = () => {
+		getHasUser()
+	}
+	const reset = () => {
+		keyword.value = ''
+		getHasUser(1)
 	}
 	onMounted(() => [getHasUser()])
 </script>
