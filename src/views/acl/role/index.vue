@@ -22,7 +22,7 @@
 				<template #default="scope">
 					<el-button type="primary" icon="User" size="small" @click="setPression(scope.row)">分配权限</el-button>
 					<el-button type="primary" icon="Edit" size="small" @click="updateRole(scope.row)">编辑</el-button>
-					<el-popconfirm :title="`你确定要删除${scope.row.username}吗`" width="200" @confirm="deletUser(scope.row)">
+					<el-popconfirm :title="`你确定要删除${scope.row.roleName}吗`" width="200" @confirm="deletRole(scope.row)">
 						<template #reference>
 							<el-button type="primary" icon="Delete" size="small">删除</el-button>
 						</template>
@@ -81,7 +81,7 @@
 	</el-drawer>
 </template>
 <script setup lang="ts">
-	import { reqAllRole, reqAddOrUpdateRole, reqAllPermission, reqSetPermission } from '@/api/acl/role'
+	import { reqAllRole, reqAddOrUpdateRole, reqAllPermission, reqSetPermission, reqDeleteRole } from '@/api/acl/role'
 	import type { RoleData, MenuDataList } from '@/api/acl/role/type'
 	import { ElMessage } from 'element-plus'
 	import { nextTick, onMounted, reactive, ref } from 'vue'
@@ -186,6 +186,13 @@
 			ElMessage.success('分配成功')
 			getHasRole(refPageNo.value)
 			drawer.value = false
+		}
+	}
+	const deletRole = async (row: RoleData) => {
+		const res = await reqDeleteRole(row.id as number)
+		if (res) {
+			ElMessage.success('删除成功')
+			getHasRole(roleArr.value.length > 1 ? refPageNo.value : refPageNo.value - 1)
 		}
 	}
 	onMounted(() => {

@@ -11,6 +11,8 @@ enum API {
 	ALLPERMISSION_URL = '/admin/acl/permission/toAssign/',
 	//给角色分配权限
 	SETPERMISSION_URL = '/admin/acl/permission/doAssign/?',
+	//删除已有的职位
+	DELETEROLE_URL = '/admin/acl/role/remove/',
 }
 export const reqAllRole = (page: number, limit: number, roleName: string) =>
 	request.get<any, RoleResponseData>(`${API.ALLROLE_URL}${page}/${limit}?roleName=${roleName}`)
@@ -24,3 +26,4 @@ export const reqAddOrUpdateRole = (data: RoleData) => {
 export const reqAllPermission = (roleId: number) => request.get<any, MenuResponseData>(API.ALLPERMISSION_URL + roleId)
 export const reqSetPermission = (roleId: number, permissionId: number[]) =>
 	request.post<any, any>(`${API.SETPERMISSION_URL}roleId=${roleId}&permissionId=${permissionId}`)
+export const reqDeleteRole = (roleId: number) => request.delete<any, any>(API.DELETEROLE_URL + roleId)

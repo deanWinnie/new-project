@@ -66,7 +66,7 @@
 		.layout_tabbar {
 			position: fixed;
 			width: calc(100% - $base-menu-width);
-			background-color: white;
+			// background-color: white;
 			height: $base-tabbar-height;
 			top: 0px;
 			left: $base-menu-width;
