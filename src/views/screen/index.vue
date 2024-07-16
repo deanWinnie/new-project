@@ -14,7 +14,11 @@
 					<Map class="map"></Map>
 					<Line class="line"></Line>
 				</div>
-				<div class="right"></div>
+				<div class="right">
+					<Rank class="rank"></Rank>
+					<Year class="year"></Year>
+					<Couter class="couter"></Couter>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -27,6 +31,9 @@
 	import Sex from './components/sex/index.vue'
 	import Map from './components/map/index.vue'
 	import Line from './components/line/index.vue'
+	import Year from './components/year/index.vue'
+	import Rank from './components/rank/index.vue'
+	import Couter from './components/couter/index.vue'
 
 	let screen = ref()
 	const getScale = (w = 1920, h = 1080) => {
@@ -66,6 +73,17 @@
 			height: 1040px;
 			.right {
 				flex: 1;
+				display: flex;
+				flex-direction: column;
+				.rank {
+					flex: 1.5;
+				}
+				.year {
+					flex: 1;
+				}
+				.couter {
+					flex: 1;
+				}
 			}
 			.center {
 				flex: 2;

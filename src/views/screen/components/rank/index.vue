@@ -1,7 +1,7 @@
 <template>
 	<div class="box">
 		<div class="top">
-			<p class="title">未来7天游客量趋势图</p>
+			<p class="title">热门景区排行</p>
 			<p class="bg"></p>
 		</div>
 		<div class="charts" ref="charts"></div>
@@ -15,45 +15,47 @@
 		const mycharts = echarts.init(charts.value)
 		mycharts.setOption({
 			title: {
-				text: '访问量趋势图',
+				text: '景区排行',
+				left: '50%',
+				textStyle: {
+					color: 'white',
+				},
+				subtext: '各大景区排行',
+				subtextStyle: {
+					color: '#ccc',
+					fontSize: 16,
+				},
 			},
 			xAxis: {
 				type: 'category',
-				boundaryGap: false,
-				splitLine: {
-					show: false,
-				},
-				data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-				axisLine: {
-					show: true,
-				},
-				axisTick: {
-					show: true,
-				},
 			},
 			yAxis: {
 				splitLine: {
 					show: false,
 				},
-				axisLine: {
-					show: true,
-				},
-				axisTick: {
-					show: true,
-				},
+				// axisLine:{
+				// 	show:true
+				// },
+				// axisTick:{
+				// 	show:true
+				// }
 			},
 			grid: {
-				left: 40,
-				right: 10,
-				top: 0,
-				bottom: 30,
+				left: 50,
+				right: 20,
+				top: 60,
+				bottom: 20,
 			},
 			series: [
 				{
-					type: 'line',
-					data: [120, 240, 566, 99, 2321, 890, 1200],
-					smooth: true,
-					areaStyle: {
+					type: 'bar',
+					data: [10, 20, 30, 40, 50, 60, 70],
+					label: {
+						show: true,
+						poistion: 'insideTop',
+					},
+					showBackground: true,
+					backgroundStyle: {
 						color: {
 							type: 'linear',
 							x: 0,
@@ -63,7 +65,7 @@
 							colorStops: [
 								{
 									offset: 0,
-									color: 'red', // 0% 处的颜色
+									color: 'black', // 0% 处的颜色
 								},
 								{
 									offset: 1,
@@ -73,8 +75,21 @@
 							global: false, // 缺省为 false
 						},
 					},
+					itemStyle: {
+						borderRadius: [5, 5, 0, 0],
+						color: function (data: any) {
+							let arr = ['red', 'orange', 'yellowgreen', 'grenn', 'purple', 'hotpink', 'skyblue']
+							return arr[data.dataIndex]
+						},
+					},
+				},
+				{
+					type: 'line',
+					data: [10, 20, 30, 40, 50, 60, 70],
+					smooth: true,
 				},
 			],
+			tooltip: {},
 		})
 	})
 </script>
@@ -84,7 +99,7 @@
 		height: 100%;
 		background: url(../../images/dataScreen-main-lb.png) no-repeat;
 		background-size: 100% 100%;
-		margin: 0 10px;
+		margin: 10px;
 		.top {
 			.title {
 				color: white;

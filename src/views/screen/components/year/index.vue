@@ -1,7 +1,7 @@
 <template>
 	<div class="box">
 		<div class="top">
-			<p class="title">未来7天游客量趋势图</p>
+			<p class="title">年度游客量对比</p>
 			<p class="bg"></p>
 		</div>
 		<div class="charts" ref="charts"></div>
@@ -15,64 +15,29 @@
 		const mycharts = echarts.init(charts.value)
 		mycharts.setOption({
 			title: {
-				text: '访问量趋势图',
+				text: '散点图',
+				textStyle: {
+					color: 'white',
+				},
 			},
 			xAxis: {
 				type: 'category',
-				boundaryGap: false,
-				splitLine: {
-					show: false,
-				},
-				data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-				axisLine: {
-					show: true,
-				},
-				axisTick: {
-					show: true,
-				},
+				show: false,
 			},
 			yAxis: {
-				splitLine: {
-					show: false,
-				},
-				axisLine: {
-					show: true,
-				},
-				axisTick: {
-					show: true,
-				},
+				show: false,
 			},
 			grid: {
 				left: 40,
-				right: 10,
-				top: 0,
-				bottom: 30,
+				right: 0,
+				top: 30,
+				bottom: 20,
 			},
 			series: [
 				{
-					type: 'line',
-					data: [120, 240, 566, 99, 2321, 890, 1200],
-					smooth: true,
-					areaStyle: {
-						color: {
-							type: 'linear',
-							x: 0,
-							y: 0,
-							x2: 0,
-							y2: 1,
-							colorStops: [
-								{
-									offset: 0,
-									color: 'red', // 0% 处的颜色
-								},
-								{
-									offset: 1,
-									color: 'blue', // 100% 处的颜色
-								},
-							],
-							global: false, // 缺省为 false
-						},
-					},
+					type: 'scatter',
+					data: [33, 88, 21, 9, 788, 234, 1213, 1231, 6674, 3],
+					symbol: 'arrow',
 				},
 			],
 		})
